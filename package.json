@@ -1,0 +1,22 @@
+{
+  "name": "vue-event-bus",
+  "version": "1.0.1",
+  "repository": "git@github.com:lifuzhao100/vue-eventBus.git",
+  "author": "lifuzhao100 <lifuzhao1995@qq.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^2.36.1",
+    "standard-version": "^9.1.0"
+  },
+  "main": "./index.umd.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "cjs": "rollup ./index.js --file ./dist/index.cjs.js --format=cjs",
+    "umd": "rollup ./index.js --file ./dist/index.umd.js --format=umd --name=VueEventBus",
+    "release": "standard-version"
+  },
+  "peerDependencies": {
+    "vue": "^2.6.12"
+  }
+}
