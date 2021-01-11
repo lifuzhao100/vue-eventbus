@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue EventBus</title>
+    <style>
+        p {
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <comp-1 v-if="show1"></comp-1>
+    <comp-2 v-if="show2"></comp-2>
+</div>
+<dl id="dl">
+
+</dl>
+<script type="module">
+  import Vue from "https://lib.baomitu.com/vue/2.6.12/vue.esm.browser.js"
+  import install from '../index.js'
+
+  Vue.use(install)
+
+  const postMessage = function (current, mill) {
+    mill = mill === undefined ? 1000 : mill
+    setTimeout(() => {
+      this.$bus.emit(`from-${current}`, `<p><strong>${current}</strong>: 当前时间 ${new Date()}</p>`)
+    }, mill)
+  }
+  const onMessage = function (current, from) {
+    const post = postMessage.bind(this)
+    this.$bus.on(`from-${from}`, function (message) {
+      const fragment = document.createDocumentFragment();
+      const dt = document.createElement('dt')
+      dt.innerHTML = `current: <strong>${current}</strong>, got message from <i>${from}</i>`
+      const dd = document.createElement('dd');
+      dd.innerHTML = `message content :${message}`
+      fragment.appendChild(dt)
+      fragment.appendChild(dd)
+      dl.appendChild(fragment)
+      post(current)
+    })
+  }
+
+  const dl = document.getElementById('dl')
+
+  const beforeDestroy = function (compName) {
+    this.$on('hook:beforeDestroy', () => {
+      const fragment = document.createDocumentFragment();
+      const dt = document.createElement('dt')
+      dt.innerText = compName + ' destroyed'
+      const dd = document.createElement('dd')
+      dd.innerText = 'eventBus _events: ' + JSON.stringify(this.$bus._events, function replacer(key, value) {
+        if (value instanceof Function) {
+          return 'function stringify to fn'
+        }
+        return value;
+      })
+      fragment.appendChild(dt)
+      fragment.appendChild(dd)
+      dl.appendChild(fragment)
+    })
+  }
+
+  Vue.component('comp-1', {
+    template: '<div></div>',
+    mounted() {
+      const compName = 'comp-1'
+      const post = postMessage.bind(this)
+      const on = onMessage.bind(this)
+      on(compName, 'comp-2')
+      post(compName, 0)
+
+      beforeDestroy.call(this, compName)
+    },
+  })
+
+  Vue.component('comp-2', {
+    template: '<div></div>',
+    mounted() {
+      const compName = 'comp-2'
+      const on = onMessage.bind(this)
+      on(compName, 'comp-1')
+
+      beforeDestroy.call(this, compName)
+    },
+  })
+
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        show1: true,
+        show2: true,
+      }
+    },
+    mounted() {
+      ;[1, 2].forEach(index => {
+        setTimeout(() => {
+          // 3s/6s秒后触发子组件hook:beforeDestroy
+          this['show' + index] = false
+        }, index * 3000)
+      })
+    },
+  })
+</script>
+</body>
+</html>
