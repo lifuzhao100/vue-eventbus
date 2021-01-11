@@ -66,12 +66,25 @@ Vue.use(eventBus, '$eventBus')
 > 在Vue组件内部使用时，无需关注事件回调的销毁，在组件销毁时会自动清除
 
 ## api
+- $on   别名on
+```typescript
+function $on(event: string | Array<string>, fn: Function) : EventBus;
+```
+注册事件监听，event为Array时注册多个相同回调的事件监听
+- $off  别名off
+```typescript
+function $off(event: string | Array<string>, fn: Function | undefined) : EventBus;
+```
+为 !fn === true时清空当前事件监听
 
-- $on
-- $once
-- $emit
-- $off
-- on    $on的别名
-- once  $once的别名
-- emit  $emit的别名
-- off   $off的别名
+- $once 别名once
+```typescript
+function $once(event: string | Array<string>, fn: Function | undefined) : EventBus;
+```
+执行第一次事件回调前会将当前回调移除(fn为Function时)或者清空(!fn === false时)
+
+- $emit 别名emit
+```typescript
+function $emit(event: string, ...rest) : EventBus;
+```
+触发事件监听，将注册的同名事件的所有回调执行，参数为rest。(背后执行的是fn.apply(eventBus, rest))
