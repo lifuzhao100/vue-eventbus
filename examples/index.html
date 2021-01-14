@@ -19,7 +19,7 @@
 </dl>
 <script type="module">
   import Vue from "https://lib.baomitu.com/vue/2.6.12/vue.esm.browser.js"
-  import install from '../index.js'
+  import install from '../src/index.js'
 
   Vue.use(install)
 
@@ -67,11 +67,17 @@
   Vue.component('comp-1', {
     template: '<div></div>',
     mounted() {
+      const self = this
       const compName = 'comp-1'
       const post = postMessage.bind(this)
       const on = onMessage.bind(this)
       on(compName, 'comp-2')
       post(compName, 0)
+
+      this.$bus.$once('from-comp-2', function () {
+        console.log(this===self)
+        console.log('i only console for the first time')
+      })
 
       beforeDestroy.call(this, compName)
     },

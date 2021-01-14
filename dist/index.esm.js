@@ -3,6 +3,7 @@ function install(Vue, injectName) {
   const eventBus = new Vue({});
   const $on = eventBus.$on;
   const $off = eventBus.$off;
+  const $once = eventBus.$once;
   const props = {}
   ;(['on', 'once', 'off', 'emit']).forEach(key => {
     props[key] = {
@@ -30,6 +31,13 @@ function install(Vue, injectName) {
           ctx.$on('hook:beforeDestroy', () => {
             this.$off(event, oldFn);
           });
+        },
+        $once(event, oldFn) {
+          const newFn = (...rest) => oldFn.apply(ctx, rest);
+
+          weakMap.set(oldFn, newFn);
+
+          $once.call(eventBus, event, newFn);
         },
         $off(event, oldFn) {
           let newFn = oldFn;

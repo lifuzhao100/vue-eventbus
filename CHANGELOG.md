@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### 1.0.4 (2021-01-14)
 
+- 修复$once绑定this指向不正确的问题
+
 ### 1.0.2 (2021-01-11)
 
 - 支持事件回调自动绑定组件this
